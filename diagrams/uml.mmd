@@ -1,28 +1,41 @@
 classDiagram
-    %% Replace the placeholders below with your actual classes, attributes, methods, and relationships.
-    %% Keep this file updated so it matches your final implementation.
+    class Owner {
+        +str name
+        +List~Pet~ pets
+        +add_pet(pet: Pet) None
+        +get_all_tasks() List~Task~
+    }
 
-    class Owner { 
-        +String name
-        +add_pet() 
-    } 
- 
-    class Pet { 
-        +String name
-        +get_info() 
+    class Pet {
+        +str name
+        +str species
+        +int age
+        +List~Task~ tasks
+        +get_info() str
+        +add_task(task: Task) None
+        +get_tasks() List~Task~
     }
 
     class Task {
-        +String description
-        +complete_task()
+        +str description
+        +Time time
+        +str frequency
+        +bool completed
+        +str priority
+        +int duration_minutes
+        +complete_task() None
     }
 
     class Scheduler {
-        +List tasks
-        +schedule_tasks()
+        +Owner owner
+        +add_task(pet: Pet, task: Task) None
+        +schedule_tasks() List~Task~
+        +get_pending_tasks() List~Task~
+        +get_todays_tasks() List~Task~
+        -_sort_tasks(tasks: List~Task~) List~Task~
     }
 
-    Owner --> Pet : owns
-    Owner --> Task : creates
-    Pet --> Task : has
+    Owner "1" --> "*" Pet : owns
+    Pet "1" --> "*" Task : has
+    Scheduler --> Owner : schedules for
     Scheduler --> Task : manages

@@ -66,9 +66,17 @@ pytest --cov
 
 Sample test output:
 
-```
+## Sample Output
+Today's Schedule
+================
+08:00 AM | Feed Buddy | Priority: High | Status: Pending
+09:30 AM | Walk Buddy | Priority: Medium | Status: Pending
+12:00 PM | Feed Luna | Priority: High | Status: Pending
+
 # Paste your pytest output here
-```
+tests\test_pawpal.py ..                                                                                                                                 [100%]
+
+===================================================================== 2 passed in 0.03s ======================================================================
 
 ## 📐 Smarter Scheduling
 
