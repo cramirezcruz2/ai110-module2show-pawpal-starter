@@ -1,3 +1,4 @@
+
 import streamlit as st
 from datetime import date, time
 from pawpal_system import Owner, Pet, Task, Scheduler
@@ -16,6 +17,10 @@ scheduler = st.session_state.scheduler
 st.title("🐾 PawPal+")
 st.write("Plan and organize your pets' daily care tasks.")
 
+# --------------------------------------------------
+# Update Owner Name
+# --------------------------------------------------
+
 owner_name = st.text_input("Owner name", value=owner.name)
 
 if st.button("Update owner name"):
@@ -23,6 +28,10 @@ if st.button("Update owner name"):
     st.success("Owner name updated!")
 
 st.divider()
+
+# --------------------------------------------------
+# Add a Pet
+# --------------------------------------------------
 
 st.subheader("Add a Pet")
 
@@ -44,6 +53,10 @@ with st.form("pet_form"):
         else:
             st.error("Please enter a pet name.")
 
+# --------------------------------------------------
+# Display Pets
+# --------------------------------------------------
+
 st.subheader("Your Pets")
 
 if owner.pets:
@@ -53,6 +66,10 @@ else:
     st.info("Add a pet before creating tasks.")
 
 st.divider()
+
+# --------------------------------------------------
+# Add a Care Task
+# --------------------------------------------------
 
 st.subheader("Add a Care Task")
 
@@ -99,6 +116,9 @@ if owner.pets:
 
 st.divider()
 
+# --------------------------------------------------
+# Daily Schedule
+# --------------------------------------------------
 
 st.subheader("Daily Schedule")
 
@@ -124,6 +144,118 @@ if tasks:
 else:
     st.info("No tasks scheduled for today.")
 
+st.divider()
+
+# --------------------------------------------------
+# Edit an Existing Task
+# --------------------------------------------------
+
+st.subheader("✏️ Edit a Task")
+
+all_tasks = scheduler.schedule_tasks()
+
+if not all_tasks:
+    st.info("Add a task first before editing it.")
+else:
+    # Show the task description, pet, date, and time
+    # so you can identify the task you want to edit.
+    def task_label(task):
+        pet_name = next(
+            (
+                pet.name
+                for pet in owner.pets
+                if any(existing is task for existing in pet.tasks)
+            ),
+            "Unknown pet"
+        )
+
+        return (
+            f"{task.description} — {pet_name} — "
+            f"{task.scheduled_date.strftime('%b %d, %Y')} "
+            f"at {task.time.strftime('%I:%M %p')}"
+        )
+
+    selected_index = st.selectbox(
+        "Select a task to edit",
+        options=list(range(len(all_tasks))),
+        format_func=lambda i: task_label(all_tasks[i]),
+        key="edit_task_selection"
+    )
+
+    selected_task = all_tasks[selected_index]
+
+    with st.form("edit_task_form"):
+        edit_description = st.text_input(
+            "Task description",
+            value=selected_task.description
+        )
+
+        edit_date = st.date_input(
+            "Scheduled date",
+            value=selected_task.scheduled_date
+        )
+
+        edit_time = st.time_input(
+            "Task time",
+            value=selected_task.time
+        )
+
+        frequency_options = ["daily", "weekly", "once"]
+        current_frequency = selected_task.frequency.lower()
+
+        edit_frequency = st.selectbox(
+            "Frequency",
+            frequency_options,
+            index=(
+                frequency_options.index(current_frequency)
+                if current_frequency in frequency_options
+                else 0
+            )
+        )
+
+        priority_options = ["low", "medium", "high"]
+        current_priority = selected_task.priority.lower()
+
+        edit_priority = st.selectbox(
+            "Priority",
+            priority_options,
+            index=(
+                priority_options.index(current_priority)
+                if current_priority in priority_options
+                else 1
+            )
+        )
+
+        edit_duration = st.number_input(
+            "Duration (minutes)",
+            min_value=1,
+            max_value=240,
+            value=max(1, min(240, selected_task.duration_minutes))
+        )
+
+        save_changes = st.form_submit_button("Save Changes")
+
+        if save_changes:
+            if edit_description.strip():
+                selected_task.description = edit_description.strip()
+                selected_task.scheduled_date = edit_date
+                selected_task.time = edit_time
+                selected_task.frequency = edit_frequency
+                selected_task.priority = edit_priority
+                selected_task.duration_minutes = int(edit_duration)
+
+                st.success("Task updated successfully!")
+                st.rerun()
+            else:
+                st.error("Please enter a task description.")
+
+st.divider()
+
+# --------------------------------------------------
+# Scheduling Conflict Warnings
+# --------------------------------------------------
+
+st.subheader("⚠️ Scheduling Conflicts")
 
 conflicts = scheduler.detect_conflicts()
 
