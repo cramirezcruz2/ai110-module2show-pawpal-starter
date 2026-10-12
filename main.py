@@ -3,7 +3,6 @@ from pawpal_system import Owner, Pet, Task, Scheduler
 
 
 def main():
-    # Create an owner and pets
     owner = Owner(name="Alex")
     buddy = Pet(name="Buddy", species="Dog", age=3)
     luna = Pet(name="Luna", species="Cat", age=2)
@@ -14,7 +13,6 @@ def main():
     scheduler = Scheduler(owner=owner)
     today = date.today()
 
-    # Add tasks OUT OF ORDER to test sorting
     task1 = Task(
         description="Feed Luna",
         time=time(12, 0),
@@ -39,7 +37,6 @@ def main():
         scheduled_date=today,
     )
 
-    # Same time as Feed Luna to test conflict detection
     task4 = Task(
         description="Give Luna medicine",
         time=time(12, 0),
@@ -53,7 +50,6 @@ def main():
     scheduler.add_task(buddy, task3)
     scheduler.add_task(luna, task4)
 
-    # 1. Test sorting
     print("\nTODAY'S SORTED SCHEDULE")
     print("=======================")
 
@@ -64,21 +60,18 @@ def main():
             f"Priority: {task.priority.title()}"
         )
 
-    # 2. Test filtering by pet
     print("\nBUDDY'S TASKS")
     print("=============")
 
     for task in scheduler.get_tasks_by_pet("Buddy"):
         print(task.description)
 
-    # 3. Test filtering by completion status
     print("\nPENDING TASKS")
     print("=============")
 
     for task in scheduler.filter_tasks(completed=False):
         print(task.description)
 
-    # 4. Test conflict detection
     print("\nSCHEDULE CONFLICTS")
     print("==================")
 
@@ -90,7 +83,6 @@ def main():
     else:
         print("No conflicts detected.")
 
-    # 5. Test recurring tasks
     print("\nRECURRING TASK TEST")
     print("===================")
 
@@ -103,7 +95,6 @@ def main():
         print(f"Next date: {next_task.scheduled_date}")
         print(f"Completed status: {next_task.completed}")
 
-    # 6. Test completed-task filtering
     print("\nCOMPLETED TASKS")
     print("===============")
 
