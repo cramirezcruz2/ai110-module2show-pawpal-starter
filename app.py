@@ -99,22 +99,31 @@ if owner.pets:
 
 st.divider()
 
+
 st.subheader("Daily Schedule")
 
-if st.button("Generate Schedule"):
-    tasks = scheduler.get_todays_tasks()
+tasks = scheduler.get_todays_tasks()
 
-    if tasks:
-        for task in tasks:
-            st.write(
-                f"**{task.time.strftime('%I:%M %p')}** — "
-                f"{task.description} | "
-                f"Priority: {task.priority.title()} | "
-                f"Duration: {task.duration_minutes} minutes | "
-                f"Status: {'Completed' if task.completed else 'Pending'}"
-            )
-    else:
-        st.info("No tasks scheduled for today.")
+if tasks:
+    for i, task in enumerate(tasks):
+        st.write(
+            f"**{task.time.strftime('%I:%M %p')}** — "
+            f"{task.description} | "
+            f"Priority: {task.priority.title()} | "
+            f"Duration: {task.duration_minutes} minutes"
+        )
+
+        if task.completed:
+            st.success("✅ Completed")
+        else:
+            st.warning("⏳ Pending")
+
+            if st.button("Mark Complete", key=f"complete_{i}"):
+                scheduler.mark_task_complete(task)
+                st.rerun()
+else:
+    st.info("No tasks scheduled for today.")
+
 
 conflicts = scheduler.detect_conflicts()
 

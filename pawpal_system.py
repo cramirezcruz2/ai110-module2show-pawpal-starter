@@ -63,13 +63,18 @@ class Scheduler:
         """Assign a task to a pet belonging to this owner."""
         if not any(p is pet for p in self.owner.pets):
             raise ValueError(
-                "Cannot add a task to a pet that does not belong to this owner."
+                "Cannot add a task to a pet that does not belong "
+                "to this owner."
             )
+
         pet.add_task(task)
 
-    def sort_by_time(self, tasks: list[Task] | None = None) -> list[Task]:
+    def sort_by_time(
+        self, tasks: list[Task] | None = None
+    ) -> list[Task]:
         """Sort tasks by time, then by priority."""
         priority_order = {"high": 0, "medium": 1, "low": 2}
+
         tasks_to_sort = (
             self.owner.get_all_tasks() if tasks is None else tasks
         )
@@ -103,8 +108,12 @@ class Scheduler:
                 continue
 
             for task in pet.tasks:
-                if completed is not None and task.completed != completed:
+                if (
+                    completed is not None
+                    and task.completed != completed
+                ):
                     continue
+
                 results.append(task)
 
         return self.sort_by_time(results)
@@ -114,71 +123,75 @@ class Scheduler:
         return self.filter_tasks(pet_name=pet_name)
 
     def get_todays_tasks(self) -> list[Task]:
-        """Return tasks due today based on their frequency."""
+        """Return tasks scheduled for today."""
         today = date.today()
-        todays_tasks = []
 
-        for task in self.owner.get_all_tasks():
-            if task.scheduled_date > today:
-                continue
-
-            frequency = task.frequency.lower()
-
-            if frequency == "daily":
-                todays_tasks.append(task)
-            elif frequency == "weekly":
-                if task.scheduled_date.weekday() == today.weekday():
-                    todays_tasks.append(task)
-            elif frequency == "monthly":
-                if task.scheduled_date.day == today.day:
-                    todays_tasks.append(task)
-            elif frequency in ("once", "one-time", "one time"):
-                if task.scheduled_date == today:
-                    todays_tasks.append(task)
-            elif task.scheduled_date == today:
-                todays_tasks.append(task)
+        todays_tasks = [
+            task
+            for task in self.owner.get_all_tasks()
+            if task.scheduled_date == today
+        ]
 
         return self.sort_by_time(todays_tasks)
 
     def get_pending_tasks(self) -> list[Task]:
         """Return today's tasks that are incomplete."""
-        return self.filter_tasks(completed=False)
+        return [
+            task
+            for task in self.get_todays_tasks()
+            if not task.completed
+        ]
 
     def mark_task_complete(self, task: Task) -> Task | None:
         """Complete a task and create its next daily or weekly occurrence."""
+
+        # Confirm that the task belongs to one of this owner's pets.
+        pet = next(
+            (
+                pet
+                for pet in self.owner.pets
+                if any(existing_task is task for existing_task in pet.tasks)
+            ),
+            None,
+        )
+
+        if pet is None:
+            raise ValueError(
+                "This task does not belong to one of the owner's pets."
+            )
+
+        # Prevent duplicate completion and duplicate recurrence creation.
         if task.completed:
             return None
 
         task.complete_task()
 
-        for pet in self.owner.pets:
-            if any(existing_task is task for existing_task in pet.tasks):
-                frequency = task.frequency.lower()
+        frequency = task.frequency.lower()
 
-                if frequency == "daily":
-                    next_date = date.today() + timedelta(days=1)
-                elif frequency == "weekly":
-                    next_date = date.today() + timedelta(days=7)
-                else:
-                    return None
+        # Calculate the next occurrence from the original scheduled date.
+        if frequency == "daily":
+            next_date = task.scheduled_date + timedelta(days=1)
+        elif frequency == "weekly":
+            next_date = task.scheduled_date + timedelta(days=7)
+        else:
+            # One-time and unsupported frequencies do not recur here.
+            return None
 
-                next_task = Task(
-                    description=task.description,
-                    time=task.time,
-                    frequency=task.frequency,
-                    completed=False,
-                    priority=task.priority,
-                    duration_minutes=task.duration_minutes,
-                    scheduled_date=next_date,
-                )
+        next_task = Task(
+            description=task.description,
+            time=task.time,
+            frequency=task.frequency,
+            completed=False,
+            priority=task.priority,
+            duration_minutes=task.duration_minutes,
+            scheduled_date=next_date,
+        )
 
-                pet.add_task(next_task)
-                return next_task
-
-        raise ValueError("This task does not belong to one of the owner's pets.")
+        pet.add_task(next_task)
+        return next_task
 
     def detect_conflicts(self) -> list[str]:
-        """Warn about tasks scheduled for the same date and exact time."""
+        """Warn about incomplete tasks at the same date and exact time."""
         tasks = self.owner.get_all_tasks()
         warnings = []
 
@@ -190,16 +203,21 @@ class Scheduler:
                 if task_b.completed:
                     continue
 
-                same_date = task_a.scheduled_date == task_b.scheduled_date
+                same_date = (
+                    task_a.scheduled_date == task_b.scheduled_date
+                )
                 same_time = task_a.time == task_b.time
 
                 if same_date and same_time:
                     pet_a = next(
-                        pet.name for pet in self.owner.pets
+                        pet.name
+                        for pet in self.owner.pets
                         if any(t is task_a for t in pet.tasks)
                     )
+
                     pet_b = next(
-                        pet.name for pet in self.owner.pets
+                        pet.name
+                        for pet in self.owner.pets
                         if any(t is task_b for t in pet.tasks)
                     )
 
