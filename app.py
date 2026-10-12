@@ -122,3 +122,10 @@ if st.button("Generate Schedule"):
     else:
         st.info("No tasks scheduled for today.")
 
+conflicts = scheduler.detect_conflicts()
+
+if conflicts:
+    for conflict in conflicts:
+        st.warning(conflict)
+else:
+    st.success("No scheduling conflicts found!")
