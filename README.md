@@ -43,16 +43,11 @@ pip install -r requirements.txt
 7. Refine UML so it matches what you actually built.
 
 ## 🖥️ Sample Output
-
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
-
-```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
-```
+Today's Schedule
+================
+08:00 AM | Feed Buddy | Priority: High | Status: Pending
+09:30 AM | Walk Buddy | Priority: Medium | Status: Pending
+12:00 PM | Feed Luna | Priority: High | Status: Pending
 
 ## 🧪 Testing PawPal+
 
@@ -65,38 +60,33 @@ pytest --cov
 ```
 
 Sample test output:
+========================================================== test session starts ===========================================================
+platform win32 -- Python 3.13.2, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\Cesar\ai110-module2show-pawpal-starter
+plugins: anyio-4.15.1
+collected 6 items                                                                                                                         
 
-## Sample Output
-Today's Schedule
-================
-08:00 AM | Feed Buddy | Priority: High | Status: Pending
-09:30 AM | Walk Buddy | Priority: Medium | Status: Pending
-12:00 PM | Feed Luna | Priority: High | Status: Pending
+tests\test_pawpal.py ......                                                                                                         [100%]
 
-# Paste your pytest output here
-tests\test_pawpal.py ..                                                                                                                                 [100%]
-
-===================================================================== 2 passed in 0.03s ======================================================================
+=========================================================== 6 passed in 0.09s ============================================================
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
-|---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+|---|---|---|
+| Task sorting | `sort_by_time()` | Sorts tasks by time, using priority to break ties. |
+| Filtering | `filter_tasks()`, `get_tasks_by_pet()` | Filters tasks by completion status or pet name. |
+| Conflict detection | `detect_conflicts()` | Identifies incomplete tasks scheduled for the same date and exact time. |
+| Recurring tasks | `mark_task_complete()` | Creates the next occurrence when a daily or weekly task is completed. |
+| Daily schedule | `get_todays_tasks()` | Returns tasks due today based on their scheduled date and frequency. |
 
 ## 📸 Demo Walkthrough
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
-
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+1. Launch PawPal+ using Streamlit.
+2. Enter the owner's information and add a pet, including its name, species, and age.
+3. Add a care task such as feeding, walking, or giving medication. Set the time, duration, priority, and frequency.
+4. Review today's schedule. Tasks are organized by time, and priority is used to break ties.
+5. Check any conflict warnings to identify tasks that share the same date and time.
+6. Mark a task complete and verify that the system creates the next occurrence for daily or weekly task.
