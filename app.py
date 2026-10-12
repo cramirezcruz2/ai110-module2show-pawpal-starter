@@ -4,7 +4,6 @@ from pawpal_system import Owner, Pet, Task, Scheduler
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 
-# Keep owner and scheduler data between Streamlit reruns
 if "owner" not in st.session_state:
     st.session_state.owner = Owner(name="Jordan")
 
@@ -17,7 +16,6 @@ scheduler = st.session_state.scheduler
 st.title("🐾 PawPal+")
 st.write("Plan and organize your pets' daily care tasks.")
 
-# Owner information
 owner_name = st.text_input("Owner name", value=owner.name)
 
 if st.button("Update owner name"):
@@ -26,7 +24,6 @@ if st.button("Update owner name"):
 
 st.divider()
 
-# Add a pet
 st.subheader("Add a Pet")
 
 with st.form("pet_form"):
@@ -47,7 +44,6 @@ with st.form("pet_form"):
         else:
             st.error("Please enter a pet name.")
 
-# Display pets
 st.subheader("Your Pets")
 
 if owner.pets:
@@ -58,7 +54,6 @@ else:
 
 st.divider()
 
-# Add a care task
 st.subheader("Add a Care Task")
 
 if owner.pets:
@@ -104,7 +99,6 @@ if owner.pets:
 
 st.divider()
 
-# Generate today's schedule
 st.subheader("Daily Schedule")
 
 if st.button("Generate Schedule"):
