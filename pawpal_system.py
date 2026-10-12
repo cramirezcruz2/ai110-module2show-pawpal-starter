@@ -151,7 +151,6 @@ class Scheduler:
 
         task.complete_task()
 
-        # Find the pet that owns this task.
         for pet in self.owner.pets:
             if any(existing_task is task for existing_task in pet.tasks):
                 frequency = task.frequency.lower()
