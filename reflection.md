@@ -30,6 +30,7 @@ Yes, my design changed during implementation.
 - If yes, describe at least one change and why you made it.
 
 I added sorting, filtering, recurring tasks, and conflict detection to make the scheduler more useful and organized. These changes helped automate tasks and make it easier to manage pet care schedules.
+
 ---
 
 ## 2. Scheduling Logic and Tradeoffs
@@ -51,6 +52,7 @@ My scheduler only detects tasks scheduled for the exact same date and time, so i
 - Why is that tradeoff reasonable for this scenario?
 
 This tradeoff is reasonable because it keeps the code simple and easy to understand while still warning pet owners about basic scheduling conflicts.
+
 ---
 
 ## 3. AI Collaboration
@@ -70,6 +72,7 @@ I used AI to help design my UML diagram, write Python code, fix errors, and impr
 - How did you evaluate or verify what the AI suggested?
 
 I did not accept every AI suggestion without checking it. For example, I reviewed the suggested conflict detection code to make sure it matched my project requirements. I tested two tasks scheduled for the same date and time and verified that the scheduler returned a conflict warning. I also ran my automated tests to make sure the scheduler worked as expected.
+
 ---
 
 ## 4. Testing and Verification
